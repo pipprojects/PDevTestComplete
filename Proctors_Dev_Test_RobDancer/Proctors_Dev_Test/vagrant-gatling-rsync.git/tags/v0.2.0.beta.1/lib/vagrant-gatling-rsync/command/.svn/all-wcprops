@@ -1,0 +1,11 @@
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/76/tags/v0.2.0.beta.1/lib/vagrant-gatling-rsync/command
+END
+rsync_auto.rb
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/76/tags/v0.2.0.beta.1/lib/vagrant-gatling-rsync/command/rsync_auto.rb
+END

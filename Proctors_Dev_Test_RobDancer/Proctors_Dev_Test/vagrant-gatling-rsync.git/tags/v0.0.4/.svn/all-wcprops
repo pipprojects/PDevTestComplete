@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4
+END
+.ruby-version
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4/.ruby-version
+END
+LICENSE
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4/LICENSE
+END
+Rakefile
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4/Rakefile
+END
+vagrant-gatling-rsync.gemspec
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4/vagrant-gatling-rsync.gemspec
+END
+.gitignore
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4/.gitignore
+END
+CHANGELOG.md
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4/CHANGELOG.md
+END
+Gemfile
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4/Gemfile
+END
+README.md
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/74/tags/v0.0.4/README.md
+END

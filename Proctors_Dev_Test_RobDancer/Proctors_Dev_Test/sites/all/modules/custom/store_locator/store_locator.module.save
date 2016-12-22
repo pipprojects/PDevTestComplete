@@ -1,0 +1,200 @@
+<?php 
+
+/**
+ * 
+ * This module is where you need to write your custom importer.
+ * The info file includes a css file on every page
+ * 
+ * There is a menu hook below which creates a page http://drupalinterview.local/store_locator/import
+ * There is a form defined already with a box to enter the CSV data
+ * 
+ * You should write your submit handler in the store_locator_import_submit function
+ * 
+ */
+
+/**
+ * Implements hook_menu
+ *
+ * Setting up our menu options
+ * @return array
+ *
+ */
+function store_locator_menu()
+{
+    $items['store_locator/import'] = array(
+        'title' => 'Import Stores',
+        'description' => 'Import Stores in to the system',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('store_locator_import'),
+        'access callback' => TRUE,
+    );
+    
+    $items['store_locator/list'] = array(
+        'title' => 'List Stores',
+        'description' => 'View all stores',
+        'page callback' => 'store_locator_view_all',
+        'access callback' => TRUE,
+    );
+    
+    $items['store_locator/store/%'] = array(
+        'title' => 'Store Details',
+        'description' => 'View a single store',
+        'page callback' => 'store_locator_view_store',
+        'page arguments' => array(2),
+        'access callback' => TRUE,
+    );
+    
+    return $items;
+}
+
+/**
+ * This function is where your form is built
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function store_locator_import($form, &$form_state)
+{
+    $form['notes'] = array(
+        '#type' => 'markup',
+        '#markup' => '<h2>Paste your CSV data in to the text area below</h2>',
+    );
+    $form['csv_data'] = array(
+        '#title' => t("CSV Data"),
+        '#type' => 'textarea',
+        '#description' => 'Paste your CSV data in here.',
+    );
+    
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Update'),
+    );
+    
+    return $form;
+}
+
+/**
+ * This is the function that will process the data submitted in the form 
+ * Process your import in here
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function store_locator_import_submit($form, &$form_state)
+{
+    //the submitted form data will be in here
+    //dpm($form_state);
+    //The CSV data will be in $form_state['values']['csv_data']
+    //dpm($form_state['values']['csv_data']);
+    
+    //HINT: Use str-getcsv or fgetcsv to parse the string in to an array
+    //http://php.net/manual/en/function.str-getcsv.php http://php.net/manual/en/function.fgetcsv.php
+
+    global $user;
+
+    $types = node_type_get_types();
+    dpm($types);
+
+    $nodes = entity_load('node');
+    dpm($nodes);
+/*
+    $storeData = explode("\n", $form_state['values']['csv_data']);
+    $Header = array();
+    $Stores = array();
+    foreach ( $storeData as $key=>$data ) {
+        if ( !$Header ) {
+            dpm("Header");
+            foreach ( str_getcsv($data, "	") as $k=>$d ) {
+                $Header[] = $d;
+            }
+            dpm($Header);
+        } else {
+            $store = array();
+            foreach ( str_getcsv($data, "	") as $k=>$d ) {
+                //dpm($d);
+                $store[$Header[$k]] = $d;
+            }
+            $Stores[] = $store;
+        }
+    }
+*/
+    //dpm($Stores);
+/*
+    foreach ( $Stores as $k => $d ) {
+        dpm("Store " . $d["Store Name"]);
+
+
+        if ( !empty($d["Store Name"]) ) {
+            $query = new EntityFieldQuery;
+// This is not actual code from scheduler module.
+            $result = $query
+              ->entityCondition('entity_type', 'node')
+              ->propertyCondition('title', $d["Store Name"])
+              //->fieldCondition('scheduler', 'value', REQUEST_TIME, '<')
+              ->execute();
+            dpm($result);
+            //node_delete($nid);
+            if (empty($result['node'])) {
+
+                dpm("Store " . $d["Store Name"] . " does not exist");
+                $node = new stdClass();
+                $node->title = $d["Store Name"];
+                $node->type = "basic_page";
+                node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+                $node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+                $node->uid = $user->uid; 
+                $node->status = 1; //(1 or 0): published or not
+                $node->promote = 0; //(1 or 0): promoted to front page
+                $node->comment = 1; // 0 = comments disabled, 1 = read only, 2 = read/write
+
+                // Term reference (taxonomy) field
+                //$node->field_product_tid[$node->language][]['tid'] = $form_state['values']['a taxonomy term id'];
+
+                // Entity reference field
+                //$node->field_customer_nid[$node->language][] = array(
+                //  'target_id' => $form_state['values']['entity id'],
+                //  'target_type' => 'node',
+                //);
+                // 'node' is default,
+                // Other possible values are "user" and  "taxonomy_term" 
+
+                $node = node_submit($node); // Prepare node for saving
+                node_save($node);
+
+                dpm($node->title);
+            }
+        }
+    }
+*/
+
+    
+}
+
+
+
+
+/**
+ * Functions for the Non Drupal task below
+ */
+
+
+
+/*
+ * Do your store lookup in this function and just return the HTML
+ * Access this function by visiting /store_locator/list
+ * Create links to /store_locator/store/{id} for the individual store pages
+ */
+function store_locator_view_all()
+{
+    $html = 'Your HTML Here.';
+    return $html;
+}
+
+/*
+ * The store ID is passed straight in to this function
+ */
+function store_locator_view_store($storeId)
+{
+    $html = 'The Store ID is ' . $storeId;
+    return $html;
+}

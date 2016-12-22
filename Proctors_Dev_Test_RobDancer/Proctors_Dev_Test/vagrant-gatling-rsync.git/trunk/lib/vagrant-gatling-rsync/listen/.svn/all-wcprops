@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/62/trunk/lib/vagrant-gatling-rsync/listen
+END
+listenlinux.rb
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/31/trunk/lib/vagrant-gatling-rsync/listen/listenlinux.rb
+END
+listenosx.rb
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/35/trunk/lib/vagrant-gatling-rsync/listen/listenosx.rb
+END
+listenwindows.rb
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/62/trunk/lib/vagrant-gatling-rsync/listen/listenwindows.rb
+END

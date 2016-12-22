@@ -1,0 +1,287 @@
+<?php 
+
+/**
+ * 
+ * This module is where you need to write your custom importer.
+ * The info file includes a css file on every page
+ * 
+ * There is a menu hook below which creates a page http://drupalinterview.local/store_locator/import
+ * There is a form defined already with a box to enter the CSV data
+ * 
+ * You should write your submit handler in the store_locator_import_submit function
+ * 
+ */
+
+/**
+ * Implements hook_menu
+ *
+ * Setting up our menu options
+ * @return array
+ *
+ */
+function store_locator_menu()
+{
+    $items['store_locator/import'] = array(
+        'title' => 'Import Stores',
+        'description' => 'Import Stores in to the system',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('store_locator_import'),
+        'access callback' => TRUE,
+    );
+    
+    $items['store_locator/list'] = array(
+        'title' => 'List Stores',
+        'description' => 'View all stores',
+        'page callback' => 'store_locator_view_all',
+        'access callback' => TRUE,
+    );
+    
+    $items['store_locator/store/%'] = array(
+        'title' => 'Store Details',
+        'description' => 'View a single store',
+        'page callback' => 'store_locator_view_store',
+        'page arguments' => array(2),
+        'access callback' => TRUE,
+    );
+    
+    return $items;
+}
+
+/**
+ * This function is where your form is built
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function store_locator_import($form, &$form_state)
+{
+    $form['notes'] = array(
+        '#type' => 'markup',
+        '#markup' => '<h2>Paste your CSV data in to the text area below</h2>',
+    );
+    $form['csv_data'] = array(
+        '#title' => t("CSV Data"),
+        '#type' => 'textarea',
+        '#description' => 'Paste your CSV data in here.',
+    );
+    
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Update'),
+    );
+    
+    return $form;
+}
+
+/**
+ * This is the function that will process the data submitted in the form 
+ * Process your import in here
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function store_locator_import_submit($form, &$form_state)
+{
+    //the submitted form data will be in here
+    //dpm($form_state);
+    //The CSV data will be in $form_state['values']['csv_data']
+    //dpm($form_state['values']['csv_data']);
+    
+    //HINT: Use str-getcsv or fgetcsv to parse the string in to an array
+    //http://php.net/manual/en/function.str-getcsv.php http://php.net/manual/en/function.fgetcsv.php
+
+    global $user;
+
+    $types = node_type_get_types();
+
+    $query = new EntityFieldQuery;
+    $result = $query
+        ->entityCondition('entity_type', 'node')
+        ->execute();
+
+    $nodes = entity_load('node');
+
+    $storeData = explode("\n", $form_state['values']['csv_data']);
+    $Header = array();
+    $Stores = array();
+    foreach ( $storeData as $key=>$data ) {
+        $store = array();
+        if ( !$Header ) {
+            foreach ( str_getcsv($data, "	") as $k=>$d ) {
+                $Header[] = $d;
+            }
+        } else {
+            foreach ( str_getcsv($data, "	") as $k=>$d ) {
+                $store[$Header[$k]] = $d;
+            }
+        }
+
+// Only add or find store if there is a name of the store
+        if ( $store && !empty($store["Store Name"]) ) {
+
+            dpm("Checking store " . $store["Store Name"]);
+            dpm($store);
+
+            //delete_store($store["Store Name"]);
+
+            $Estore = get_store($store["Store Name"]);
+
+// Only try to find geometry if not already supplied
+            if ( empty($store["Longitude"]) || empty($store["Latitude"]) ) {
+                get_geometry($store);
+            }
+
+            if ( is_null($Estore)) {
+
+                $node = new stdClass();
+                $node->title = $store["Store Name"];
+                $node->type = "store";
+                node_object_prepare($node);
+                $node->language = LANGUAGE_NONE;
+                $node->uid = $user->uid; 
+                $node->status = 1;
+                $node->promote = 0;
+                $node->comment = 1;
+
+                $node->field_address[$node->language][]['value'] = $store["Address"];
+                $node->field_phone_number[$node->language][]['value'] = $store["Phone Number"];
+                $node->field_store_manager[$node->language][]['value'] = $store["Manager Name"];
+                $node->field_store_type[$node->language][]['value'] = $store["Store Type"];
+                $node->field_latitude[$node->language][]['value'] = $store["Latitude"];
+                $node->field_longitude[$node->language][]['value'] = $store["Longitude"];
+
+                $node = node_submit($node);
+                node_save($node);
+                dpm("Created Store " . $store["Store Name"]);
+
+                $Estore = get_store($store["Store Name"]);
+                dpm($Estore);
+            } else {
+                dpm("Store " . $store["Store Name"] . " exists");
+            }
+        }
+    }
+
+
+    
+}
+
+/*
+ * Gets the Longitude and Latitude from the address field
+ */
+function get_geometry(&$store){
+                    dpm($store);
+                    $AddressUe = urlencode($store["Address"]);
+                    $gUrl = "http://maps.googleapis.com/maps/api/geocode/json?address=" . $AddressUe;
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $gUrl);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    $output = curl_exec($ch);
+                    curl_close($ch);
+
+                    $jOutput = json_decode($output, true);
+
+                    if ( $jOutput["status"] == "OK" ) {
+
+                        foreach ( $jOutput["results"] as $kr => $result ) {
+// Note:
+// Need more info to accurately get longitude and latitude because there could be exact matches on the
+// same address.
+                            $setGeo = false;
+                            if ( array_key_exists("partial_match", $result) ) {
+                                if ( ! $result["partial_match"] ) {
+                                    $setGeo = true;
+                                }
+                            } else {
+                                $setGeo = true;
+                            }
+                            if ( $setGeo ) {
+                                if ( array_key_exists("geometry", $result) ) {
+                                    if ( array_key_exists("location", $result["geometry"]) ) {
+                                        if ( empty($store["Latitude"]) ) {
+                                            if ( array_key_exists("lat", $result["geometry"]["location"]) ) {
+                                                $store["Latitude"] = $result["geometry"]["location"]["lat"];
+                                            }
+                                        }
+                                        if ( empty($store["Longitude"]) ) {
+                                            if ( array_key_exists("lng", $result["geometry"]["location"]) ) {
+                                                $store["Longitude"] = $result["geometry"]["location"]["lng"];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+    return;
+}
+
+/*
+ * Gets store by name which is the node title
+ */
+function get_store($StoreName){
+    $query = new EntityFieldQuery;
+    $result = $query
+        ->entityCondition('entity_type', 'node')
+        ->propertyCondition('title', $StoreName)
+        ->execute();
+    if ( isset($result['node']) ) {
+        $nid = array_keys($result['node']);
+        $Estore = entity_load('node', $nid);
+    } else {
+        $Estore = null;
+    }
+    return $Estore;
+}
+
+/*
+ * Deletes store by name which is the node title
+ */
+function delete_store($StoreName) {
+    if ( !empty($StoreName) ) {
+        $query = new EntityFieldQuery;
+        $result = $query
+            ->entityCondition('entity_type', 'node')
+            ->propertyCondition('title', $StoreName)
+            ->execute();
+        if ( isset($result['node']) ) {
+            $nids = array_keys($result['node']);
+            if ( $nids ) {
+                try {
+                    node_delete_multiple($nids);
+                } catch (Exception $e) {
+                    dpm($e);
+                }
+            }
+        }
+    }
+    return;
+}
+
+
+/**
+ * Functions for the Non Drupal task below
+ */
+
+
+
+/*
+ * Do your store lookup in this function and just return the HTML
+ * Access this function by visiting /store_locator/list
+ * Create links to /store_locator/store/{id} for the individual store pages
+ */
+function store_locator_view_all()
+{
+    $html = 'Your HTML Here.';
+    return $html;
+}
+
+/*
+ * The store ID is passed straight in to this function
+ */
+function store_locator_view_store($storeId)
+{
+    $html = 'The Store ID is ' . $storeId;
+    return $html;
+}

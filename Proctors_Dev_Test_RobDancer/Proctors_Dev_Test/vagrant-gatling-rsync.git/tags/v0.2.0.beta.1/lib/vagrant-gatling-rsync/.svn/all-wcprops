@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/76/tags/v0.2.0.beta.1/lib/vagrant-gatling-rsync
+END
+plugin.rb
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/76/tags/v0.2.0.beta.1/lib/vagrant-gatling-rsync/plugin.rb
+END
+config.rb
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/76/tags/v0.2.0.beta.1/lib/vagrant-gatling-rsync/config.rb
+END
+version.rb
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/76/tags/v0.2.0.beta.1/lib/vagrant-gatling-rsync/version.rb
+END
+errors.rb
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/smerrill/vagrant-gatling-rsync.git/!svn/ver/76/tags/v0.2.0.beta.1/lib/vagrant-gatling-rsync/errors.rb
+END

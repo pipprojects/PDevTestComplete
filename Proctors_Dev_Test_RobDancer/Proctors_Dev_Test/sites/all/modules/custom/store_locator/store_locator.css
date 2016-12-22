@@ -1,0 +1,18 @@
+/*
+ * Add your CSS Styles in here.
+ * This CSS File is included on every page by default
+ */
+
+.store-manager {
+    font-size: 200%;
+}
+
+.spacer {
+    height: 20px;
+}
+
+#map {
+    height: 200px;
+    border: solid gray 1px;
+}
+
